@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaceXSearch | Professional Offline Face Search</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #ffffff;
+            --bg-subtle: #f8fafc;
+            --border: #e2e8f0;
+            --accent: #4f46e5;
+            --text-main: #0f172a;
+            --text-dim: #64748b;
+            --notice-bg: #eff6ff;
+            --notice-border: #bfdbfe;
+        }
+
+        /* --- [新增] 基础动画定义 --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* 滚动显现的基础类名 */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text-main); line-height: 1.6; scroll-behavior: smooth; }
+
+        .header-bg {
+            position: absolute; top: 0; left: 0; right: 0; height: 850px;
+            background: radial-gradient(circle at 50% -10%, rgba(79, 70, 229, 0.06) 0%, transparent 60%);
+            z-index: -1; border-bottom: 1px solid var(--border);
+            animation: fadeIn 1.5s ease-out; /* 背景淡入 */
+        }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+
+        /* Navigation */
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 32px 0; animation: fadeIn 1s ease-out; }
+        .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; transition: transform 0.3s; }
+        .nav-logo:hover { transform: scale(1.02); }
+        .app-icon { width: 32px; height: 32px; background: #C2C2E1; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #5151A2; font-weight: 800; font-size: 18px; }
+        .logo-text { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 22px; font-weight: 800; color: var(--text-main); letter-spacing: -0.5px; }
+        .logo-text span { color: #5151A2; }
+
+        /* Hero Section */
+        .hero { text-align: center; padding: 100px 0 60px; animation: fadeInUp 1s ease-out; }
+        .hero h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: clamp(32px, 7vw, 60px); line-height: 1.1; margin-bottom: 24px; color: #000; letter-spacing: -0.03em; }
+        .hero h1 span { color: var(--accent); }
+        .hero p { font-size: 18px; color: var(--text-dim); max-width: 700px; margin: 0 auto 48px; }
+
+        /* Download Group */
+        .download-group {
+            background: #fff; border: 1px solid var(--border); padding: 32px; border-radius: 24px;
+            display: inline-block; box-shadow: 0 20px 40px rgba(0,0,0,0.03);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .download-group:hover { transform: translateY(-4px); box-shadow: 0 25px 50px rgba(0,0,0,0.06); }
+        .dl-buttons { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+        .dl-btn { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-radius: 12px; text-decoration: none; color: var(--text-main); border: 1px solid var(--border); transition: 0.2s; background: #fff; }
+        .dl-btn:hover { border-color: var(--accent); background: var(--bg-subtle); transform: translateY(-2px); }
+        .dl-btn svg { width: 20px; height: 20px; fill: currentColor; }
+        .dl-btn .info { text-align: left; }
+        .dl-btn .info .os { font-size: 11px; color: var(--text-dim); display: block; line-height: 1; text-transform: uppercase; margin-bottom: 2px; }
+        .dl-btn.primary { background: var(--accent); color: #fff; border: none; }
+
+        /* Pricing */
+        .section-title { text-align: center; font-family: 'Plus Jakarta Sans'; font-size: 32px; font-weight: 800; margin: 100px 0 40px; color: #000; }
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 32px; margin-bottom: 40px; }
+        .p-card {
+            background: #fff; border: 1px solid var(--border); padding: 48px 40px; border-radius: 24px;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .p-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.05); border-color: var(--accent); }
+        .p-card.featured { border: 2px solid var(--accent); position: relative; box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
+        .price { font-size: 48px; font-weight: 800; color: #000; margin-bottom: 24px; }
+        .price span { font-size: 16px; color: var(--text-dim); font-weight: 400; }
+        .feature-list { list-style: none; margin-bottom: 40px; }
+        .feature-list li { margin-bottom: 12px; color: var(--text-dim); font-size: 15px; display: flex; align-items: center; transition: 0.2s; }
+        .feature-list li:hover { transform: translateX(4px); color: var(--text-main); }
+        .feature-list li::before { content: "✓"; color: var(--accent); margin-right: 12px; font-weight: 800; }
+
+        /* Activation Flow */
+        .activation-flow {
+            background: var(--notice-bg);
+            border: 1px solid var(--notice-border);
+            padding: 40px;
+            border-radius: 24px;
+            margin: 40px auto 100px;
+            max-width: 900px;
+        }
+        .flow-title { text-align: center; font-family: 'Plus Jakarta Sans'; font-weight: 800; font-size: 22px; margin-bottom: 32px; color: #1e40af; }
+        .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 32px; }
+        .step { position: relative; }
+        .step-tag { background: #3b82f6; color: white; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 6px; display: inline-block; margin-bottom: 16px; }
+        .step h4 { font-size: 17px; font-weight: 700; margin-bottom: 10px; color: #1e3a8a; }
+        .step p { font-size: 14px; color: #1e40af; opacity: 0.85; line-height: 1.6; }
+        .hw-hint { margin-top: 12px; padding: 10px; background: rgba(255,255,255,0.6); border-radius: 10px; font-size: 12px; border: 1px dashed #bfdbfe; color: #1e3a8a; }
+
+        /* FAQ */
+        .faq-container { max-width: 750px; margin: 0 auto 120px; }
+        .faq-item { border: 1px solid var(--border); border-radius: 16px; margin-bottom: 12px; background: #fff; transition: border-color 0.3s; }
+        .faq-item:hover { border-color: var(--accent); }
+        .faq-trigger { width: 100%; padding: 24px; text-align: left; background: none; border: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 16px; font-weight: 600; font-family: inherit; }
+
+        /* 核心动画：优化展开效果 */
+        .faq-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0, 1, 0, 1); /* 快速展开逻辑 */
+            background: var(--bg-subtle);
+            border-radius: 0 0 16px 16px;
+        }
+        .faq-item.active .faq-content {
+            max-height: 500px; /* 展开高度 */
+            transition: all 0.5s cubic-bezier(1, 0, 1, 0);
+            padding-bottom: 10px;
+        }
+        .faq-text { padding: 0 24px 24px; color: var(--text-dim); font-size: 15px; }
+
+        /* 旋转加号动画 */
+        .faq-icon { transition: transform 0.4s ease; display: inline-block; color: var(--text-dim); font-size: 20px; }
+        .faq-item.active .faq-icon {
+            transform: rotate(45deg);
+            color: var(--accent);
+        }
+
+        footer { text-align: center; padding: 80px 0; border-top: 1px solid var(--border); color: var(--text-dim); font-size: 14px; background: var(--bg-subtle); }
+    </style>
+</head>
+<body>
+
+<div class="header-bg"></div>
+
+<div class="container">
+    <nav>
+       <a href="#" class="nav-logo">
+            <div class="app-icon">F</div>
+            <div class="logo-text">Face<span>X</span>Search</div>
+        </a>
+        <div class="nav-links">
+            <a href="#pricing">Pricing</a>
+            <a href="#faq">FAQ</a>
+        </div>
+    </nav>
+
+   <header class="hero">
+        <h1>Professional Face Search. <br><span>100% Offline AI.</span></h1>
+        <p>
+            Deep-scan and cluster your entire media library using high-precision local AI. <br>
+            <b>Pay only when it works:</b> Use every search feature for free, and only upgrade when you are ready to export.
+        </p>
+
+        <div class="download-group">
+            <div class="dl-buttons">
+                <a href="#" class="dl-btn primary">
+                    <svg viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1V11.7H0V3.449zm0 17.1L9.75 21.9V12.3H0v8.249zM10.5 2V11.7H24V0L10.5 2zm0 22L24 24V12.3H10.5V24z"/></svg>
+                    <div class="info"><span class="os">Download for</span><span class="ver">Windows</span></div>
+                </a>
+                <a href="#" class="dl-btn">
+                    <svg viewBox="0 0 24 24"><path d="M17.057 20.28c-.968 0-2.68-1.106-4.88-1.106-2.177 0-3.795 1.077-4.828 1.077-1.415 0-4.33-5.392-4.33-8.001 0-2.463 1.48-3.745 3.107-3.745 1.579 0 2.91 1.123 3.904 1.123.978 0 2.505-1.217 4.463-1.217 1.155 0 3.345.451 4.405 2.123-3.54 1.66-2.832 5.515.103 6.643-.8 2.103-2.02 4.106-2.944 4.106zm-4.229-14.72c-.044-.834.663-1.601 1.248-2.062.362-.285.79-.434 1.262-.434.108 1.046-.482 2.019-1.213 2.58-.3-.232-.596-.531-.83-.884z"/></svg>
+                    <div class="info"><span class="os">macOS Apple</span><span class="ver">M1/M2/M3/M4</span></div>
+                </a>
+                <a href="#" class="dl-btn">
+                    <svg viewBox="0 0 24 24"><path d="M17.057 20.28c-.968 0-2.68-1.106-4.88-1.106-2.177 0-3.795 1.077-4.828 1.077-1.415 0-4.33-5.392-4.33-8.001 0-2.463 1.48-3.745 3.107-3.745 1.579 0 2.91 1.123 3.904 1.123.978 0 2.505-1.217 4.463-1.217 1.155 0 3.345.451 4.405 2.123-3.54 1.66-2.832 5.515.103 6.643-.8 2.103-2.02 4.106-2.944 4.106zm-4.229-14.72c-.044-.834.663-1.601 1.248-2.062.362-.285.79-.434 1.262-.434.108 1.046-.482 2.019-1.213 2.58-.3-.232-.596-.531-.83-.884z"/></svg>
+                    <div class="info"><span class="os">macOS Intel</span><span class="ver">Legacy Chip</span></div>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div id="pricing" class="section-title reveal">Lifetime Licensing</div>
+
+    <div class="pricing-grid reveal">
+        <div class="p-card featured">
+            <div class="p-label">Personal Use</div>
+            <div class="price">$69 <span>/one-time</span></div>
+            <ul class="feature-list">
+                 <li>Commercial License</li>
+                <li>Unlimited Export & Saving</li>
+                <li>Lifetime Updates</li>
+            </ul>
+            <a href="https://paypal.me/facexsearchpay/69USD" class="dl-btn primary" style="justify-content: center; width: 100%; background:#ffc439; color:#111; font-weight:700;">Buy with PayPal</a>
+        </div>
+        <div class="p-card">
+            <div class="p-label">Studio Use</div>
+            <div class="price">$299 <span>/one-time</span></div>
+            <ul class="feature-list">
+                <li>Commercial License</li>
+                <li>Unlimited Export & Saving</li>
+                <li>Activate on 10 Devices</li>
+                <li>Priority Support</li>
+            </ul>
+            <a href="https://paypal.me/facexsearchpay/299USD" class="dl-btn" style="justify-content: center; width: 100%; background:#ffc439; color:#111; font-weight:700;">Buy with PayPal</a>
+        </div>
+    </div>
+
+    <div class="activation-flow reveal">
+        <div class="flow-title">How to activate your license?</div>
+        <div class="steps">
+            <div class="step">
+                <div class="step-tag">STEP 1</div>
+                <h4>Complete Payment</h4>
+                <p>Purchase your license via <b>PayPal</b> using the buttons above.</p>
+            </div>
+            <div class="step">
+                <div class="step-tag">STEP 2</div>
+                <h4>Send Us an Email</h4>
+                <p>Email <b>support@facexsearch.com</b> with your PayPal account and <b>Hardware ID(s)</b>.</p>
+                <div class="hw-hint">
+                    💡 <b>Multi-Device Tip:</b> For Studio or Business plans, please provide a <b>list of Hardware IDs</b> (found in the <b>Account</b>  panel of each device).
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-tag">STEP 3</div>
+                <h4>Receive License</h4>
+                <p>We will verify your payment and send your unique key within <b>1-12 hours</b>.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="faq" class="section-title reveal">Frequently Asked Questions</div>
+    <div class="faq-container reveal">
+        <div class="faq-item">
+            <button class="faq-trigger">What does "Pay only when it works" mean? <span class="faq-icon">+</span></button>
+            <div class="faq-content">
+                <div class="faq-text">It means the trial is fully functional for AI scanning, clustering, and searching. You can verify that our AI accurately finds the people you are looking for before spending a dime. A license is only required when you want to <b>export</b> the results into organized folders.</div>
+            </div>
+        </div>
+        <div class="faq-item">
+            <button class="faq-trigger">Why is the scanning process slow? <span class="faq-icon">+</span></button>
+            <div class="faq-content">
+                <div class="faq-text">FaceXSearch uses a <b>Deep-Scan Engine</b> that analyzes original high-resolution images locally on your CPU/GPU for maximum accuracy and 100% privacy. For massive libraries (50k+ images), we recommend running the initial scan overnight. Search is instant once indexed.</div>
+            </div>
+        </div>
+        <div class="faq-item">
+            <button class="faq-trigger">Is my data shared with any servers? <span class="faq-icon">+</span></button>
+            <div class="faq-content">
+                <div class="faq-text">No. FaceXSearch is 100% offline. No biometric data, thumbnails, or original photos are ever uploaded to the cloud. Your privacy is protected by local processing.</div>
+            </div>
+        </div>
+        <div class="faq-item">
+            <button class="faq-trigger">Do I have to pay a subscription? <span class="faq-icon">+</span></button>
+            <div class="faq-content">
+                <div class="faq-text">No. All licenses are <b>one-time purchases</b>. You get lifetime access to the version you bought and all future minor and major updates within that tier.</div>
+            </div>
+        </div>
+        <div class="faq-item">
+            <button class="faq-trigger">How can I refine the results before exporting? <span class="faq-icon">+</span></button>
+            <div class="faq-content">
+                <div class="faq-text">
+                     You have full control over the precision. You can <b>adjust the similarity threshold</b> to group faces more strictly or broadly. Additionally, you can <b>manually deselect</b> any mismatched photos or entire clusters, ensuring that only the exact faces you need are included in your export.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 FaceXSearch. Contact: support@facexsearch.com</p>
+    </footer>
+</div>
+
+<script>
+    // FAQ 交互逻辑
+    document.querySelectorAll('.faq-trigger').forEach(trigger => {
+        trigger.addEventListener('click', () => {
+            const item = trigger.parentElement;
+
+            // 点击时切换 active 类名
+            const isActive = item.classList.contains('active');
+
+            // 如果你希望一次只能打开一个 FAQ，可以取消下面注释：
+            // document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('active'));
+
+            if (!isActive) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+    });
+
+    // [新增] 滚动显现逻辑 (Intersection Observer)
+    const observerOptions = {
+        threshold: 0.15
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            }
+        });
+    }, observerOptions);
+
+    // 观察所有带有 .reveal 类的元素
+    document.querySelectorAll('.reveal').forEach(el => {
+        observer.observe(el);
+    });
+</script>
+</body>
+</html>
